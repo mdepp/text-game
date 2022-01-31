@@ -59,8 +59,8 @@ class ExamineAction(Action):
         if items_on:
             item_names = ', '.join(item[DescriptionComponent].describe_a()
                                    for item in items_on)
-            print(f"{entity[DescriptionComponent].describe_the()} contains:"
-                  f" {item_names}")
+            print(f'{entity[DescriptionComponent].describe_the()} contains:'
+                  f' {item_names}')
 
     def rewind(self, world: World):
         pass

@@ -15,7 +15,7 @@ class Entity:
             for component in components
         }
 
-    T = TypeVar("T", bound=EntityComponent)
+    T = TypeVar('T', bound=EntityComponent)
 
     def get(self, component_class: Type[T]) -> T | None:
         return self.components.get(component_class.__name__)
