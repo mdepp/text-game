@@ -1,8 +1,8 @@
-from action import (DefaultExamineAction, DefaultTakeAction, ExamineAction,
-                    InventoryAction, PutOnAction, TakeAction)
+from action import (DefaultExamineAction, DefaultTakeAction, DropAction,
+                    ExamineAction, InventoryAction, PutOnAction, TakeAction)
 from command import PatternCommand, SimpleVerbCommand
-from component import (DescriptionComponent, InventoryComponent, OnComponent,
-                       TakeableComponent)
+from component import (DescriptionComponent, FloorComponent,
+                       InventoryComponent, OnComponent, TakeableComponent)
 from core import Action, Command, Entity, World
 from util import CommandInterpretationError, interpret_command
 
@@ -11,7 +11,8 @@ def main():
     take_command = SimpleVerbCommand('take', 'pick up', 'grab', 'get')
     examine_command = SimpleVerbCommand('examine', 'x', 'look at', 'l',
                                         'describe')
-    put_command = PatternCommand('put <item> on <item>')
+    put_command = PatternCommand('put|place|drop <item> on <item>')
+    drop_command = PatternCommand('drop <item>')
     inventory_command = PatternCommand('inventory|i')
 
     command_to_action: list[tuple[Command, Action]] = [
@@ -20,6 +21,7 @@ def main():
         (examine_command, ExamineAction()),
         (examine_command, DefaultExamineAction()),
         (put_command, PutOnAction()),
+        (drop_command, DropAction()),
         (inventory_command, InventoryAction()),
     ]
 
@@ -43,6 +45,7 @@ def main():
         Entity([
             DescriptionComponent(names=['floor', 'ground']),
             OnComponent({key}),
+            FloorComponent(),
         ]))
 
     while True:

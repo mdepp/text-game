@@ -1,5 +1,5 @@
-from component import (DescriptionComponent, InventoryComponent, OnComponent,
-                       TakeableComponent)
+from component import (DescriptionComponent, FloorComponent,
+                       InventoryComponent, OnComponent, TakeableComponent)
 from core import Action, Entity, EntitySpec, World
 
 
@@ -106,6 +106,30 @@ class PutOnAction(Action):
 
     def rewind(self, world: World):
         raise NotImplementedError()
+
+
+class DropAction(Action):
+
+    def __init__(self):
+        self.put_action = PutOnAction()
+
+    @staticmethod
+    def prerequisites() -> tuple[EntitySpec, ...]:
+        return (EntitySpec(required=(DescriptionComponent, ))),
+
+    def apply(self, world: World, entities: list[Entity]) -> bool:
+        subject, = entities
+        floor = None
+        for entity in world.entities:
+            if FloorComponent in entity:
+                floor = entity
+                break
+        if floor is None:
+            raise RuntimeError('Expected a floor to drop things onto')
+        return self.put_action.apply(world, [subject, floor])
+
+    def rewind(self, world: World):
+        return self.put_action.rewind(world)
 
 
 class InventoryAction(Action):

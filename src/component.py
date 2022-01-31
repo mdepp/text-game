@@ -46,3 +46,7 @@ class OnComponent(EntityComponent):
 
 class TakeableComponent(EntityComponent):
     pass
+
+
+class FloorComponent(EntityComponent):
+    pass

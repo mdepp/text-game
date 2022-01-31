@@ -36,7 +36,7 @@ class PatternCommand(Command):
 
     def __init__(self, pattern: str):
         pattern = pattern.replace('<item>', r'(?:the )?(\w+(?: \w+)?)')
-        pattern = re.sub(r'\b(\w\|)+(\w)\b', r'(?:\0)', pattern)
+        pattern = re.sub(r'\b((\w+\|)+(\w+))\b', r'(?:\1)', pattern)
         self.command = RegexCommand(pattern)
 
     def get_entity_names(self, command_string: str) -> list[str] | None:
