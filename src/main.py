@@ -49,7 +49,10 @@ def main():
         ]))
 
     while True:
-        command_string = input('> ')
+        try:
+            command_string = input('> ')
+        except EOFError:
+            break
         if command_string == 'exit':
             break
 
