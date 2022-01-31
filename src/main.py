@@ -1,8 +1,10 @@
-from action import (DefaultExamineAction, DefaultTakeAction, DropAction,
-                    ExamineAction, InventoryAction, PutOnAction, TakeAction)
+from action import (DefaultExamineAction, DefaultTakeAction,
+                    DescribeWorldAction, DropAction, ExamineAction,
+                    InventoryAction, PutOnAction, TakeAction)
 from command import PatternCommand, SimpleVerbCommand
 from component import (DescriptionComponent, FloorComponent,
-                       InventoryComponent, OnComponent, TakeableComponent)
+                       InventoryComponent, OnComponent, TakeableComponent,
+                       WorldDescriptionComponent)
 from core import Action, Command, Entity, World
 from util import CommandInterpretationError, interpret_command
 
@@ -14,6 +16,7 @@ def main():
     put_command = PatternCommand('put|place|drop <item> on <item>')
     drop_command = PatternCommand('drop <item>')
     inventory_command = PatternCommand('inventory|i')
+    describe_world_command = PatternCommand('examine|x|look|look_around|l')
 
     command_to_action: list[tuple[Command, Action]] = [
         (take_command, TakeAction()),
@@ -23,6 +26,7 @@ def main():
         (put_command, PutOnAction()),
         (drop_command, DropAction()),
         (inventory_command, InventoryAction()),
+        (describe_world_command, DescribeWorldAction()),
     ]
 
     world = World(player=Entity([
@@ -47,7 +51,18 @@ def main():
             OnComponent({key}),
             FloorComponent(),
         ]))
+    world.add_entity(
+        Entity([
+            WorldDescriptionComponent(
+                'You are on a floor in an infinite featureless plain.')
+        ]))
+    world.add_entity(
+        Entity([
+            DescriptionComponent(names=['infinite featureless plain'],
+                                 description='It is featureless.')
+        ]))
 
+    DescribeWorldAction().apply(world, [])
     while True:
         try:
             command_string = input('> ')

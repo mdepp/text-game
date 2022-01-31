@@ -1,5 +1,6 @@
 from component import (DescriptionComponent, FloorComponent,
-                       InventoryComponent, OnComponent, TakeableComponent)
+                       InventoryComponent, OnComponent, TakeableComponent,
+                       WorldDescriptionComponent)
 from core import Action, Entity, EntitySpec, World
 
 
@@ -11,6 +12,9 @@ class TakeAction(Action):
 
     def apply(self, world: World, entities: list[Entity]):
         entity, = entities
+        if entity in world.player[InventoryComponent].items:
+            print('You are already carrying that.')
+            return
         world.player[InventoryComponent].items.append(entity)
         for on_component in world.iter_components(OnComponent):
             if entity in on_component.items:
@@ -143,6 +147,27 @@ class InventoryAction(Action):
         print('Your inventory contains:')
         for item in items:
             print(f' - {item[DescriptionComponent].describe_a()}')
+
+    def rewind(self, world: World):
+        pass
+
+
+class DescribeWorldAction(Action):
+
+    @staticmethod
+    def prerequisites() -> tuple[EntitySpec, ...]:
+        return ()
+
+    def apply(self, world: World, entities: list[Entity]):
+        component = next(world.iter_components(WorldDescriptionComponent))
+        print(component.description)
+
+        for floor in world.entities:
+            if OnComponent in floor and FloorComponent in floor:
+                for entity in floor[OnComponent].items:
+                    print(
+                        f'There is {entity[DescriptionComponent].describe_a()}'
+                        ' here.')
 
     def rewind(self, world: World):
         pass

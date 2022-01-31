@@ -32,6 +32,12 @@ class DescriptionComponent(EntityComponent):
         return False
 
 
+class WorldDescriptionComponent(EntityComponent):
+
+    def __init__(self, description: str):
+        self.description = description
+
+
 class InventoryComponent(EntityComponent):
 
     def __init__(self):
