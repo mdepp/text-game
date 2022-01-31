@@ -1,3 +1,8 @@
+import argparse
+import logging
+
+import logzero
+
 from action import (DefaultExamineAction, DefaultTakeAction,
                     DescribeWorldAction, DropAction, ExamineAction,
                     InventoryAction, PutOnAction, TakeAction)
@@ -10,6 +15,13 @@ from util import CommandInterpretationError, interpret_command
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-v', '--verbose', action='store_true')
+    args = parser.parse_args()
+
+    if not args.verbose:
+        logzero.loglevel(logging.FATAL)
+
     take_command = SimpleVerbCommand('take', 'pick up', 'grab', 'get')
     examine_command = SimpleVerbCommand('examine', 'x', 'look at', 'l',
                                         'describe')
