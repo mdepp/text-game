@@ -1,6 +1,6 @@
 from logzero import logger
 
-from component import DescriptionComponent
+from component import DescriptionComponent, InventoryComponent
 from core import Action, Command, Entity, World
 
 
@@ -37,8 +37,10 @@ def interpret_command(world: World, command_to_action: list[tuple[Command,
         entities = []
         for entity_name in entity_names:
             matching_entities = lookup_entities(world, entity_name)
-            logger.info('Name %s matched %d entities: %s', entity_name,
-                        len(matching_entities), matching_entities)
+            logger.info(
+                'Name %s matched %d entities: %s', entity_name,
+                len(matching_entities),
+                [e[DescriptionComponent].names[0] for e in matching_entities])
             if len(matching_entities) == 1:
                 entities.extend(matching_entities)
             elif len(matching_entities) == 0:
