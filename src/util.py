@@ -1,6 +1,6 @@
 from logzero import logger
 
-from component import DescriptionComponent, InventoryComponent
+from component import DescriptionComponent
 from core import Action, Command, Entity, World
 
 
