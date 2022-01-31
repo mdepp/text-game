@@ -7,3 +7,6 @@ disable = [
     'too-few-public-methods',
     'trailing-comma-tuple',
 ]
+
+[tool.isort]
+src_paths = ['src']
