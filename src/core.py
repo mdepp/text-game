@@ -68,7 +68,7 @@ class Action(ABC):
         pass
 
     @abstractmethod
-    def apply(self, world: World, entities: list[Entity]) -> bool:
+    def apply(self, world: World, entities: list[Entity]):
         pass
 
     @abstractmethod

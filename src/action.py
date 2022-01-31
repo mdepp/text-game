@@ -16,7 +16,6 @@ class TakeAction(Action):
             if entity in on_component.items:
                 on_component.items.remove(entity)
         print(f'You take {entity[DescriptionComponent].describe_the()}')
-        return True
 
     def rewind(self, world: World):
         raise NotImplementedError()
@@ -28,9 +27,9 @@ class DefaultTakeAction(Action):
     def prerequisites() -> tuple[EntitySpec, ...]:
         return EntitySpec(required=(DescriptionComponent, )),
 
-    def apply(self, world: World, entities: list[Entity]) -> bool:
+    def apply(self, world: World, entities: list[Entity]):
         print('You cannot take that.')
-        return False
+        return
 
     def rewind(self, world: World):
         pass
@@ -42,7 +41,7 @@ class ExamineAction(Action):
     def prerequisites() -> tuple[EntitySpec, ...]:
         return EntitySpec(required=(DescriptionComponent, )),
 
-    def apply(self, world: World, entities: list[Entity]) -> bool:
+    def apply(self, world: World, entities: list[Entity]):
         entity, = entities
         description = entity[DescriptionComponent].description
         if OnComponent in entity:
@@ -58,7 +57,6 @@ class ExamineAction(Action):
             print(
                 f"{entity[DescriptionComponent].describe_the()} contains: {', '.join(item[DescriptionComponent].describe_a() for item in items_on)}"
             )
-        return True
 
     def rewind(self, world: World):
         pass
@@ -70,9 +68,9 @@ class DefaultExamineAction(Action):
     def prerequisites() -> tuple[EntitySpec, ...]:
         return EntitySpec(required=()),
 
-    def apply(self, world: World, entities: list[Entity]) -> bool:
+    def apply(self, world: World, entities: list[Entity]):
         print("It doesn't look like anything to you.")
-        return False
+        return
 
     def rewind(self, world: World):
         pass
@@ -85,24 +83,23 @@ class PutOnAction(Action):
         return (EntitySpec(required=(DescriptionComponent, )),
                 EntitySpec(required=(DescriptionComponent, )))
 
-    def apply(self, world: World, entities: list[Entity]) -> bool:
+    def apply(self, world: World, entities: list[Entity]):
         subject, object_ = entities
         if subject not in world.player[InventoryComponent].items:
             print('You are not carrying that.')
-            return False
+            return
         if subject == object_:
             print('That is less possible than you might expect.')
-            return False
+            return
         if OnComponent not in object_:
             print('You cannot put anything on '
                   f'{object_[DescriptionComponent].describe_the()}')
-            return False
+            return
 
         world.player[InventoryComponent].items.remove(subject)
         object_[OnComponent].items.add(subject)
         print(f'You put {subject[DescriptionComponent].describe_the()} on '
               f'{object_[DescriptionComponent].describe_the()}.')
-        return True
 
     def rewind(self, world: World):
         raise NotImplementedError()
@@ -117,7 +114,7 @@ class DropAction(Action):
     def prerequisites() -> tuple[EntitySpec, ...]:
         return (EntitySpec(required=(DescriptionComponent, ))),
 
-    def apply(self, world: World, entities: list[Entity]) -> bool:
+    def apply(self, world: World, entities: list[Entity]):
         subject, = entities
         floor = None
         for entity in world.entities:
@@ -138,15 +135,14 @@ class InventoryAction(Action):
     def prerequisites() -> tuple[EntitySpec, ...]:
         return ()
 
-    def apply(self, world: World, entities: list[Entity]) -> bool:
+    def apply(self, world: World, entities: list[Entity]):
         items = world.player[InventoryComponent].items
         if not items:
             print('Your inventory is empty')
-            return True
+            return
         print('Your inventory contains:')
         for item in items:
             print(f' - {item[DescriptionComponent].describe_a()}')
-        return True
 
     def rewind(self, world: World):
         pass
