@@ -33,7 +33,6 @@ class DefaultTakeAction(Action):
 
     def apply(self, world: World, entities: list[Entity]):
         print('You cannot take that.')
-        return
 
     def rewind(self, world: World):
         pass
@@ -58,9 +57,10 @@ class ExamineAction(Action):
         if description is None and len(items_on) == 0:
             print("It doesn't look like anything to you.")
         if items_on:
-            print(
-                f"{entity[DescriptionComponent].describe_the()} contains: {', '.join(item[DescriptionComponent].describe_a() for item in items_on)}"
-            )
+            item_names = ', '.join(item[DescriptionComponent].describe_a()
+                                   for item in items_on)
+            print(f"{entity[DescriptionComponent].describe_the()} contains:"
+                  f" {item_names}")
 
     def rewind(self, world: World):
         pass
@@ -74,7 +74,6 @@ class DefaultExamineAction(Action):
 
     def apply(self, world: World, entities: list[Entity]):
         print("It doesn't look like anything to you.")
-        return
 
     def rewind(self, world: World):
         pass
