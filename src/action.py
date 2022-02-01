@@ -2,6 +2,7 @@ from component import (DescriptionComponent, FloorComponent,
                        InventoryComponent, OnComponent, TakeableComponent,
                        WorldDescriptionComponent)
 from core import Action, Entity, EntitySpec, World
+from util import Query
 
 
 class TakeAction(Action):
@@ -119,13 +120,7 @@ class DropAction(Action):
 
     def apply(self, world: World, entities: list[Entity]):
         subject, = entities
-        floor = None
-        for entity in world.entities:
-            if FloorComponent in entity:
-                floor = entity
-                break
-        if floor is None:
-            raise RuntimeError('Expected a floor to drop things onto')
+        floor = Query(world).has(FloorComponent).one()
         return self.put_action.apply(world, [subject, floor])
 
     def rewind(self, world: World):
@@ -161,12 +156,11 @@ class DescribeWorldAction(Action):
         component = next(world.iter_components(WorldDescriptionComponent))
         print(component.description)
 
-        for floor in world.entities:
-            if OnComponent in floor and FloorComponent in floor:
-                for entity in floor[OnComponent].items:
-                    print(
-                        f'There is {entity[DescriptionComponent].describe_a()}'
-                        ' here.')
+        floors = Query(world).has(OnComponent).has(FloorComponent).all()
+        for floor in floors:
+            for entity in floor[OnComponent].items:
+                print(f'There is {entity[DescriptionComponent].describe_a()}'
+                      ' here.')
 
     def rewind(self, world: World):
         pass

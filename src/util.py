@@ -1,15 +1,36 @@
+from typing import Type
+
 from logzero import logger
 
 from component import DescriptionComponent
-from core import Action, Command, Entity, World
+from core import Action, Command, Entity, EntityComponent, World
+
+
+class Query:
+
+    def __init__(self, world: World, component_classes=None):
+        self.world = world
+        self.component_classes = component_classes or []
+
+    def has(self, component_class: Type[EntityComponent]):
+        return Query(self.world, self.component_classes + [component_class])
+
+    def all(self):
+        for entity in self.world.entities:
+            if all(component_class in entity
+                   for component_class in self.component_classes):
+                yield entity
+
+    def one(self):
+        entity, = self.all()
+        return entity
 
 
 def lookup_entities(world: World, entity_name: str) -> list[Entity]:
     matching_entities = []
-    for entity in world.entities:
-        if DescriptionComponent in entity:
-            if entity[DescriptionComponent].matches(entity_name):
-                matching_entities.append(entity)
+    for entity in Query(world).has(DescriptionComponent).all():
+        if entity[DescriptionComponent].matches(entity_name):
+            matching_entities.append(entity)
 
     return matching_entities
 
