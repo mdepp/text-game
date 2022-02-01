@@ -6,7 +6,7 @@ import logzero
 from action import (DefaultExamineAction, DefaultTakeAction,
                     DescribeWorldAction, DropAction, ExamineAction,
                     InventoryAction, PutOnAction, TakeAction)
-from command import PatternCommand, SimpleVerbCommand
+from command import PatternCommand
 from component import (DescriptionComponent, FloorComponent,
                        InventoryComponent, OnComponent, TakeableComponent,
                        WorldDescriptionComponent)
@@ -15,9 +15,8 @@ from util import CommandInterpretationError, interpret_command
 
 
 def make_command_to_action():
-    take_command = SimpleVerbCommand('take', 'pick up', 'grab', 'get')
-    examine_command = SimpleVerbCommand('examine', 'x', 'look at', 'l',
-                                        'describe')
+    take_command = PatternCommand('take|pick_up|grab|get <item>')
+    examine_command = PatternCommand('examine|x|look_at|l|describe <item>')
     put_command = PatternCommand('put|place|drop <item> on <item>')
     drop_command = PatternCommand('drop <item>')
     inventory_command = PatternCommand('inventory|i')
