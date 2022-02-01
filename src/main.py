@@ -10,18 +10,11 @@ from command import PatternCommand, SimpleVerbCommand
 from component import (DescriptionComponent, FloorComponent,
                        InventoryComponent, OnComponent, TakeableComponent,
                        WorldDescriptionComponent)
-from core import Action, Command, Entity, World
+from core import Action, Command, Entity, Room, World
 from util import CommandInterpretationError, interpret_command
 
 
-def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-v', '--verbose', action='store_true')
-    args = parser.parse_args()
-
-    if not args.verbose:
-        logzero.loglevel(logging.FATAL)
-
+def make_command_to_action():
     take_command = SimpleVerbCommand('take', 'pick up', 'grab', 'get')
     examine_command = SimpleVerbCommand('examine', 'x', 'look at', 'l',
                                         'describe')
@@ -40,13 +33,17 @@ def main():
         (inventory_command, InventoryAction()),
         (describe_world_command, DescribeWorldAction()),
     ]
+    return command_to_action
 
+
+def make_world():
     world = World(player=Entity([
         InventoryComponent(),
         DescriptionComponent(names=['player', 'me', 'self', 'myself'],
                              description="It's just you")
     ]))
-    world.add_entity(
+    room = Room()
+    room.add_entity(
         Entity([
             DescriptionComponent(names=['you', 'narrator'],
                                  description='Who, me?')
@@ -56,23 +53,38 @@ def main():
                              description='A rusty iron key'),
         TakeableComponent(),
     ])
-    world.add_entity(key)
-    world.add_entity(
+    room.add_entity(key)
+    room.add_entity(
         Entity([
             DescriptionComponent(names=['floor', 'ground']),
             OnComponent({key}),
             FloorComponent(),
         ]))
-    world.add_entity(
+    room.add_entity(
         Entity([
             WorldDescriptionComponent(
                 'You are on a floor in an infinite featureless plain.')
         ]))
-    world.add_entity(
+    room.add_entity(
         Entity([
             DescriptionComponent(names=['infinite featureless plain'],
                                  description='It is featureless.')
         ]))
+    world.add_room(room)
+    world.set_room(room)
+    return world
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-v', '--verbose', action='store_true')
+    args = parser.parse_args()
+
+    if not args.verbose:
+        logzero.loglevel(logging.FATAL)
+
+    command_to_action = make_command_to_action()
+    world = make_world()
 
     DescribeWorldAction().apply(world, [])
     while True:
