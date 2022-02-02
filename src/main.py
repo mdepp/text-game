@@ -3,9 +3,10 @@ import logging
 
 import logzero
 
-from action import (DefaultExamineAction, DefaultTakeAction,
-                    DescribeWorldAction, DropAction, ExamineAction,
-                    InventoryAction, MoveAction, PutOnAction, TakeAction)
+from action import (DefaultEnterAction, DefaultExamineAction,
+                    DefaultTakeAction, DescribeWorldAction, DropAction,
+                    EnterAction, ExamineAction, InventoryAction, MoveAction,
+                    PutOnAction, TakeAction)
 from command import PatternCommand
 from component import (DescriptionComponent, Direction, FloorComponent,
                        InventoryComponent, OnComponent, PortalComponent,
@@ -27,6 +28,9 @@ def make_command_to_action():
     move_south_command = PatternCommand('[move|go|travel|m ]s|south')
     move_west_command = PatternCommand('[move|go|travel|m ]w|west')
 
+    enter_command = PatternCommand(
+        'enter|move_through|walk_through|go_through|travel_through <item>')
+
     command_to_action: list[tuple[Command, Action]] = [
         (take_command, TakeAction()),
         (take_command, DefaultTakeAction()),
@@ -40,6 +44,8 @@ def make_command_to_action():
         (move_east_command, MoveAction(Direction.E)),
         (move_south_command, MoveAction(Direction.S)),
         (move_west_command, MoveAction(Direction.W)),
+        (enter_command, EnterAction()),
+        (enter_command, DefaultEnterAction()),
     ]
     return command_to_action
 

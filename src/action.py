@@ -188,3 +188,32 @@ class MoveAction(Action):
 
     def rewind(self, world: World):
         raise NotImplementedError()
+
+
+class EnterAction(Action):
+
+    @staticmethod
+    def prerequisites() -> tuple[EntitySpec, ...]:
+        return EntitySpec(required=(PortalComponent, )),
+
+    def apply(self, world: World, entities: list[Entity]):
+        portal, = entities
+        world.set_room(portal[PortalComponent].room)
+
+    def rewind(self, world: World):
+        raise NotImplementedError()
+
+
+class DefaultEnterAction(Action):
+
+    @staticmethod
+    def prerequisites() -> tuple[EntitySpec, ...]:
+        return EntitySpec(required=(DescriptionComponent, )),
+
+    def apply(self, world: World, entities: list[Entity]):
+        entity, = entities
+        name = entity[DescriptionComponent].describe_the()
+        print(f'You cannot enter {name}.')
+
+    def rewind(self, world: World):
+        pass
