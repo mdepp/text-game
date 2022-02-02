@@ -5,11 +5,11 @@ import logzero
 
 from action import (DefaultExamineAction, DefaultTakeAction,
                     DescribeWorldAction, DropAction, ExamineAction,
-                    InventoryAction, PutOnAction, TakeAction)
+                    InventoryAction, MoveAction, PutOnAction, TakeAction)
 from command import PatternCommand
-from component import (DescriptionComponent, FloorComponent,
-                       InventoryComponent, OnComponent, TakeableComponent,
-                       WorldDescriptionComponent)
+from component import (DescriptionComponent, Direction, FloorComponent,
+                       InventoryComponent, OnComponent, PortalComponent,
+                       TakeableComponent, WorldDescriptionComponent)
 from core import Action, Command, Entity, Room, World
 from util import CommandInterpretationError, interpret_command
 
@@ -22,6 +22,11 @@ def make_command_to_action():
     inventory_command = PatternCommand('inventory|i')
     describe_world_command = PatternCommand('examine|x|look|look_around|l')
 
+    move_north_command = PatternCommand('[move|go|travel|m ]n|north')
+    move_east_command = PatternCommand('[move|go|travel|m ]e|east')
+    move_south_command = PatternCommand('[move|go|travel|m ]s|south')
+    move_west_command = PatternCommand('[move|go|travel|m ]w|west')
+
     command_to_action: list[tuple[Command, Action]] = [
         (take_command, TakeAction()),
         (take_command, DefaultTakeAction()),
@@ -31,6 +36,10 @@ def make_command_to_action():
         (drop_command, DropAction()),
         (inventory_command, InventoryAction()),
         (describe_world_command, DescribeWorldAction()),
+        (move_north_command, MoveAction(Direction.N)),
+        (move_east_command, MoveAction(Direction.E)),
+        (move_south_command, MoveAction(Direction.S)),
+        (move_west_command, MoveAction(Direction.W)),
     ]
     return command_to_action
 
@@ -48,31 +57,50 @@ def make_world():
                                  description='Who, me?')
         ]))
 
-    room = Room()
+    room1 = Room()
+    room2 = Room()
+
     key = Entity([
         DescriptionComponent(names=['iron key'],
                              description='A rusty iron key'),
         TakeableComponent(),
     ])
-    room.add_entity(key)
-    room.add_entity(
+    room1.add_entity(key)
+    room1.add_entity(
         Entity([
             DescriptionComponent(names=['floor', 'ground']),
             OnComponent({key}),
             FloorComponent(),
         ]))
-    room.add_entity(
+    room1.add_entity(
         Entity([
             WorldDescriptionComponent(
-                'You are on a floor in an infinite featureless plain.')
+                'You are on a floor in an infinite featureless plain.'
+                ' On the eastern edge of the plain looms an ethereal doorframe,'
+                ' beyond which you only see blackness.')
         ]))
-    room.add_entity(
+    room1.add_entity(
         Entity([
             DescriptionComponent(names=['infinite featureless plain'],
                                  description='It is featureless.')
         ]))
-    world.add_room(room)
-    world.set_room(room)
+    room1.add_entity(
+        Entity([
+            DescriptionComponent(
+                names=['ethereal door', 'ethereal doorframe'],
+                description='Beyond the door there is only blackness.'),
+            PortalComponent(room=room2, direction=Direction.E),
+        ]))
+
+    room2.add_entity(
+        Entity([
+            WorldDescriptionComponent(
+                'It is very dark here. You cannot see or feel anything.')
+        ]))
+
+    world.add_room(room1)
+    world.add_room(room2)
+    world.set_room(room1)
     return world
 
 
@@ -87,8 +115,11 @@ def main():
     command_to_action = make_command_to_action()
     world = make_world()
 
-    DescribeWorldAction().apply(world, [])
+    current_room = None
     while True:
+        if world.current_room != current_room:
+            DescribeWorldAction().apply(world, [])
+            current_room = world.current_room
         try:
             command_string = input('> ')
         except EOFError:

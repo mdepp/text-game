@@ -1,6 +1,7 @@
 import re
+from enum import Enum
 
-from core import Entity, EntityComponent
+from core import Entity, EntityComponent, Room
 
 
 class DescriptionComponent(EntityComponent):
@@ -56,3 +57,24 @@ class TakeableComponent(EntityComponent):
 
 class FloorComponent(EntityComponent):
     pass
+
+
+class Direction(Enum):
+    N = 'north'
+    NE = 'north-east'
+    E = 'east'
+    SE = 'south-east'
+    S = 'south'
+    SW = 'south-west'
+    W = 'west'
+    NW = 'north-west'
+    UP = 'up'
+    DOWN = 'down'
+    NONE = 'none'
+
+
+class PortalComponent(EntityComponent):
+
+    def __init__(self, room: Room, direction: Direction):
+        self.room = room
+        self.direction = direction

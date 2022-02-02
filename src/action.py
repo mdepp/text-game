@@ -1,6 +1,6 @@
-from component import (DescriptionComponent, FloorComponent,
-                       InventoryComponent, OnComponent, TakeableComponent,
-                       WorldDescriptionComponent)
+from component import (DescriptionComponent, Direction, FloorComponent,
+                       InventoryComponent, OnComponent, PortalComponent,
+                       TakeableComponent, WorldDescriptionComponent)
 from core import Action, Entity, EntitySpec, World
 from util import Query
 
@@ -164,3 +164,27 @@ class DescribeWorldAction(Action):
 
     def rewind(self, world: World):
         pass
+
+
+class MoveAction(Action):
+
+    def __init__(self, direction: Direction):
+        super().__init__()
+        self.direction = direction
+
+    @staticmethod
+    def prerequisites() -> tuple[EntitySpec, ...]:
+        return ()
+
+    def apply(self, world: World, entities: list[Entity]):
+        found_portal = False
+        for portal in world.iter_components(PortalComponent):
+            if portal.direction == self.direction:
+                found_portal = True
+                world.set_room(portal.room)
+
+        if not found_portal:
+            print('You cannot go that way.')
+
+    def rewind(self, world: World):
+        raise NotImplementedError()

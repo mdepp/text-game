@@ -21,11 +21,13 @@ class PatternCommand(Command):
     Command defined using a simple help-like syntax, e.g.
 
         put|place|drop <item> on <item>
+        [move|go ]north|n
     """
 
     def __init__(self, pattern: str):
         pattern = pattern.replace('<item>', r'(?:the )?(\w+(?: \w+)?)')
         pattern = re.sub(r'\b((\w+\|)+(\w+))\b', r'(?:\1)', pattern)
+        pattern = re.sub(r'\[(.*?)\]', r'(?:\1)?', pattern)
         pattern = pattern.replace('_', ' ')
         self.command = RegexCommand(pattern)
 
