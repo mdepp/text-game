@@ -16,7 +16,7 @@ class Query:
         return Query(self.world, self.component_classes + [component_class])
 
     def all(self):
-        for entity in self.world.entities:
+        for entity in self.world.current_entities:
             if all(component_class in entity
                    for component_class in self.component_classes):
                 yield entity

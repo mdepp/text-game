@@ -40,16 +40,20 @@ class World:
 
     def __init__(self, player: Entity):
         self.player = player
-        self.entities = [player]
         self.rooms = []
+        self.global_entities = []
         self.current_room = None
+        self.current_entities = [player]
 
     T = TypeVar('T', bound=EntityComponent)
 
     def iter_components(self, component_class: Type[T]):
-        for entity in self.entities:
+        for entity in self.current_entities:
             if component_class in entity:
                 yield entity[component_class]
+
+    def add_entity(self, entity: Entity):
+        self.global_entities.append(entity)
 
     def add_room(self, room: Room):
         self.rooms.append(room)
@@ -57,7 +61,9 @@ class World:
     def set_room(self, room: Room):
         assert room in self.rooms
         self.current_room = room
-        self.entities = [self.player] + self.current_room.entities
+        self.current_entities = [
+            self.player
+        ] + self.current_room.entities + self.global_entities
 
 
 class Command(ABC):

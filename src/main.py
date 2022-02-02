@@ -41,12 +41,14 @@ def make_world():
         DescriptionComponent(names=['player', 'me', 'self', 'myself'],
                              description="It's just you")
     ]))
-    room = Room()
-    room.add_entity(
+
+    world.add_entity(
         Entity([
             DescriptionComponent(names=['you', 'narrator'],
                                  description='Who, me?')
         ]))
+
+    room = Room()
     key = Entity([
         DescriptionComponent(names=['iron key'],
                              description='A rusty iron key'),
