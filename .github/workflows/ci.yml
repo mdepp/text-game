@@ -15,6 +15,6 @@ jobs:
         run: >
           sudo apt-get update && sudo apt-get install -y make
       - name: set up environment
-        run: python3 -m pip install -U -r requirements.txt -r requirements.txt --user
+        run: python3 -m pip install -U -r requirements.txt -r requirements.dev.txt --user
       - name: lint
         run: make lint

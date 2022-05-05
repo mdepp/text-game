@@ -1,3 +1,4 @@
 yapf
 isort
 unify
+pylint~=2.13.8
