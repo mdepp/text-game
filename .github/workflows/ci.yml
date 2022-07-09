@@ -1,0 +1,20 @@
+name: CI
+
+on: [push]
+
+jobs:
+  precheck:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v3
+        with:
+          python-version: '3.10'
+      - name: install make
+        run: >
+          sudo apt-get update && sudo apt-get install -y make
+      - name: set up environment
+        run: python3 -m pip install -U -r requirements.txt -r requirements.dev.txt --user
+      - name: lint
+        run: make lint
